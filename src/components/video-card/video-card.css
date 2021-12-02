@@ -1,0 +1,16 @@
+.card {
+    width: 400px !important;
+    height: auto !important;
+    margin: 15px;
+}
+
+.content {
+    width: 100%;
+    height: 100%;
+}
+
+/*LeafletMap {*/
+/*    position: unset;*/
+/*    width: 100%;*/
+/*    height: auto;*/
+/*}*/
