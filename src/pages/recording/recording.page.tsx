@@ -44,9 +44,10 @@ export const RecordingPage = () => {
                 onStartRecording={recordStarted}
                 onRecordingComplete={recordCompleted}
                 onError={showCameraError}
+                constraints={{ audio: true, video: { facingMode: { ideal: "environment" } } }}
             />
             <a className={'gallery-btn'} href="/gallery" >Gallery</a>
-
+            {/*<button className={'switch-btn'} onClick={switchCamera}>Switch Camera</button>*/}
             {dialogMsg &&
             <MsgDialog title={'Error'}
                        msg={dialogMsg}
