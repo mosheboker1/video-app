@@ -1,7 +1,7 @@
 .gallery-btn {
     position: absolute;
     bottom: 0;
-    right: 0;
+    left: 0;
     margin: 2vh 2vw;
     background-color: white;
     border-radius: 15px;
