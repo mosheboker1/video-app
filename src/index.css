@@ -14,7 +14,7 @@
 
 .full {
   height: 100vh;
-  height: -webkit-fill-available;
+  max-height: -webkit-fill-available;
   width: 100vw;
 }
 
