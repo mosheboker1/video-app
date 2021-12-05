@@ -11,6 +11,10 @@ class UploadFiles {
         await localforage.setItem(KEY, videos);
     }
 
+    async setFiles(videos) {
+        await localforage.setItem(KEY, videos);
+    }
+
     getFiles() {
         return localforage.getItem(KEY);
     }
