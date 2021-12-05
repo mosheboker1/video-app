@@ -29,6 +29,7 @@ export const RecordingPage = () => {
     };
 
     let recordCompleted = (blob) => {
+        debugger;
         const video: Video = {
             createTime: dayjs().format('DD/MM/YYYY HH:mm'),
             blob: blob,

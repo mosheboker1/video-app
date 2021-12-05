@@ -7,6 +7,7 @@ export interface VideoCardProps {
 }
 
 export const VideoCard = (props: VideoCardProps) => {
+    debugger;
     return (
         <div className={'card col'}>
             <div className={'flx ctr'}>
