@@ -5,8 +5,14 @@ import {Video} from '../../models/video';
 import uploads from '../../services/files.service';
 import './recording.page.css';
 import dayjs from 'dayjs';
+import Menu from 'antd/lib/menu';
+import {UserOutlined} from '@ant-design/icons';
+import {Dropdown} from 'antd';
+import videosService from '../../services/video.service';
+import AppStore from '../../store/app.store';
+import {toJS} from 'mobx';
 
-export const RecordingPage = () => {
+export const RecordingPage = (props: { store: typeof AppStore }) => {
     const [dialogData, setDialogData] = useState(null);
     const [startPos, setStartPos] = useState(null);
     const [startCamera, setStartCamera] = useState(false);
@@ -16,9 +22,10 @@ export const RecordingPage = () => {
             setDialogData({title: 'error', msg: 'You need to enable location'});
         } else {
             if (!localStorage.getItem('allowedCamera') ||
-                !localStorage.getItem('allowedLocation'))
+                !localStorage.getItem('allowedLocation')) {
+                setStartCamera(true);
                 setDialogData({title: 'Permissions', msg: 'Please enable your camera & location.'});
-            else
+            } else
                 setStartCamera(true);
         }
     }, []);
@@ -31,11 +38,15 @@ export const RecordingPage = () => {
     let recordCompleted = (blob) => {
         const video: Video = {
             createTime: dayjs().format('DD/MM/YYYY HH:mm'),
+            file: new File([blob], dayjs().format('DDMMYY_HHmmss'), {
+                lastModified: new Date().getTime(),
+                type: blob.type
+            }),
             blob: blob,
             location: startPos
         };
-        console.log({video});
         uploads.saveFile(video);
+        videosService.saveVideo(video, toJS(props.store.profile).id);
     };
 
     let activate = () => {
@@ -44,7 +55,7 @@ export const RecordingPage = () => {
             localStorage.setItem('allowedLocation', '1');
         });
         let constraints = {audio: true, video: true};
-        navigator.mediaDevices.getUserMedia(constraints)
+        navigator.mediaDevices?.getUserMedia(constraints)
             .then((stream) => {
                 localStorage.setItem('allowedCamera', '1');
                 setStartCamera(true);
@@ -63,9 +74,21 @@ export const RecordingPage = () => {
         console.log({cameraE});
         setDialogData('Access to camera is block');
     };
-
+    let menu =
+        <Menu>
+            <Menu.Item>
+                <a href="/login"> Login </a>
+            </Menu.Item>
+            <Menu.Item>
+                <a href="/register"> Register </a>
+            </Menu.Item>
+        </Menu>;
     return (
         <div className={'full'}>
+            <Dropdown trigger={['click']} overlay={menu} className={'menu-btn ant-dropdown-link'}>
+                <UserOutlined/>
+            </Dropdown>
+
             {startCamera && <VideoRecorder
                 isOnInitially={startCamera}
                 isFlipped={true}
@@ -78,11 +101,11 @@ export const RecordingPage = () => {
             <a className={'gallery-btn'} href="/gallery">Gallery</a>
             {/*<button className={'switch-btn'} onClick={switchCamera}>Switch Camera</button>*/}
             {!!dialogData &&
-            <MsgDialog data={dialogData}
-                       showModal={!!dialogData}
-                       handleOk={activate}
-                       handleCancel={closeDialog}
-            />
+                <MsgDialog data={dialogData}
+                           showModal={!!dialogData}
+                           handleOk={activate}
+                           handleCancel={closeDialog}
+                />
             }
         </div>
     );

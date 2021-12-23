@@ -1,12 +1,10 @@
 import React, {Component} from 'react';
-import axios from 'axios';
 import {Link, Navigate} from 'react-router-dom';
-import authService from '../../services/auth.service';
+import './register.page.css';
+import profileService from '../../services/profile.service';
 
 export default class RegisterPage extends Component {
-
     state = {
-        name: '',
         email: '',
         password: '',
         redirect: false,
@@ -15,47 +13,30 @@ export default class RegisterPage extends Component {
     };
 
     handleEmailChange = event => {
-        this.setState({email: event.target.value});
+        this.setState({email: event.target.value, authError: null});
     };
     handlePwdChange = event => {
-        this.setState({password: event.target.value});
-    };
-    handleNameChange = event => {
-        this.setState({name: event.target.value});
+        this.setState({password: event.target.value, authError: null});
     };
 
     handleSubmit = event => {
         event.preventDefault();
         this.setState({isLoading: true});
-        // Todo: Link to real endpoint
-        const url = 'https://video-server.com/register';
         const email = this.state.email;
         const password = this.state.password;
-        const name = this.state.name;
-        let bodyFormData = new FormData();
-        bodyFormData.set('email', email);
-        bodyFormData.set('name', name);
-        bodyFormData.set('password', password);
-        authService.registerUser(email, password).then(a => {
-            console.log({a});
+        profileService.registerUser(email, password).then(cred => {
+            if (cred?.user?.uid)
+                profileService.createProfile(cred?.user?.uid, email).then((profile) => {
+                    // Todo: cache videos
+                });
         }).catch(e => {
-            if (e?.code === 'auth/weak-password')
-                this.setState({authError: 'Password too weak.'});
-            console.log({e});
-        });
-        axios.post(url, bodyFormData)
-            .then(result => {
-                this.setState({isLoading: false});
-                if (result.data.status !== 'fail') {
-                    this.setState({redirect: true, authError: null});
-                } else {
-                    this.setState({redirect: false, authError: 'Failed to login'});
-                }
-            })
-            .catch(error => {
-                console.log(error);
-                this.setState({authError: 'Failed to login', isLoading: false});
-            });
+            let errMsg = 'General Error.';
+            if (e.code === 'auth/email-already-in-use')
+                errMsg = 'Email already exist.';
+            else if (e.code === 'auth/weak-password')
+                errMsg = 'Password is too weak. Use at least 6 characters.';
+            this.setState({authError: errMsg});
+        }).finally(() => this.setState({isLoading: false}));
     };
 
     renderRedirect = () => {
@@ -74,22 +55,11 @@ export default class RegisterPage extends Component {
                         <form onSubmit={this.handleSubmit}>
                             <div className="form-group">
                                 <div className="form-label-group">
-                                    <input type="text" id="inputName" className="form-control" placeholder="name"
-                                           name="name" onChange={this.handleNameChange} autoFocus required/>
-                                    <label htmlFor="inputName">Name</label>
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <div className="form-label-group">
                                     <input id="inputEmail"
-                                           className={'form-control ' + (this.state.authError ? 'is-invalid' : '')}
+                                           className={'form-control'}
                                            placeholder="Email address" type="text" name="email"
                                            onChange={this.handleEmailChange} required/>
                                     <label htmlFor="inputEmail">Email address</label>
-                                    <div className="invalid-feedback">
-                                        Please provide a valid Email address.
-                                    </div>
                                 </div>
                             </div>
                             <div className="form-group">
@@ -100,6 +70,10 @@ export default class RegisterPage extends Component {
                                     <label htmlFor="inputPassword">Password</label>
                                 </div>
                             </div>
+
+                            {!!this.state.authError && <div className="invalid m-3">
+                                {this.state.authError}
+                            </div>}
 
                             <div className="form-group">
                                 <button className="btn btn-primary btn-block" type="submit"
