@@ -2,7 +2,7 @@ import fire from '../assets/config/fire';
 import {createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword} from 'firebase/auth';
 import axios from 'axios';
 
-const SERVER_URL = 'http://localhost:7000';
+const SERVER_URL = 'http://localhost:8000';
 
 class ProfileService {
     async loginUser(email, pwd) {
@@ -21,6 +21,11 @@ class ProfileService {
 
     async createProfile(firebaseId: string, email: string) {
         return await axios.post(`${SERVER_URL}/profiles`, {firebaseId, email});
+    }
+
+    async logout() {
+        const auth = getAuth(fire);
+        return await auth.signOut();
     }
 
     //

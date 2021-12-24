@@ -1,7 +1,7 @@
 import {Video} from '../models/video';
 import axios from 'axios';
 
-const SERVER_URL = 'http://localhost:7000';
+const SERVER_URL = 'http://localhost:8000';
 
 class VideosService {
     async saveVideos(video: Video[], profileId: string) {
@@ -14,11 +14,9 @@ class VideosService {
     async saveVideo(video: Video, profileId: any) {
         let formData = new FormData();
         formData.append('video', video.file);
-        let response = await axios.post(`${SERVER_URL}/videos/upload`, formData, {
-            params: {
-                profileId
-            }
-        });
+        formData.append('profileId', profileId);
+
+        let response = await axios.post(`${SERVER_URL}/videos/upload`, formData);
         if (!response.data.saved) {
             console.error('Try again');
         }

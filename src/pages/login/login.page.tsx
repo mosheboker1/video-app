@@ -27,7 +27,6 @@ export default class LoginPage extends Component {
         const pwd = this.state.password;
         profileService.loginUser(email, pwd).then((cred) => {
             profileService.fetchProfile(cred.user.uid).then((profile) => {
-                debugger;
                 appStore.setProfile(profile.data.data);
                 this.setState({redirect: true});
             });

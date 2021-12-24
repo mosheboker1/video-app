@@ -11,6 +11,7 @@ import {Dropdown} from 'antd';
 import videosService from '../../services/video.service';
 import AppStore from '../../store/app.store';
 import {toJS} from 'mobx';
+import profileService from '../../services/profile.service';
 
 export const RecordingPage = (props: { store: typeof AppStore }) => {
     const [dialogData, setDialogData] = useState(null);
@@ -46,7 +47,11 @@ export const RecordingPage = (props: { store: typeof AppStore }) => {
             location: startPos
         };
         uploads.saveFile(video);
-        videosService.saveVideo(video, toJS(props.store.profile).id);
+        debugger;
+        const profile = toJS(props.store.profile)
+        if (profile) {
+            videosService.saveVideo(video, profile.id);
+        }
     };
 
     let activate = () => {
@@ -74,18 +79,28 @@ export const RecordingPage = (props: { store: typeof AppStore }) => {
         console.log({cameraE});
         setDialogData('Access to camera is block');
     };
-    let menu =
-        <Menu>
-            <Menu.Item>
-                <a href="/login"> Login </a>
-            </Menu.Item>
-            <Menu.Item>
-                <a href="/register"> Register </a>
-            </Menu.Item>
-        </Menu>;
+    let menuNoUser = <Menu>
+        <Menu.Item>
+            <a href="/login"> Login </a>
+        </Menu.Item>
+        <Menu.Item>
+            <a href="/register"> Register </a>
+        </Menu.Item>
+    </Menu>;
+
+    async function logout() {
+        await profileService.logout();
+    }
+
+    let menu = <Menu>
+        <Menu.Item>
+            <button onClick={() => logout()}> Logout</button>
+        </Menu.Item>
+    </Menu>;
     return (
         <div className={'full'}>
-            <Dropdown trigger={['click']} overlay={menu} className={'menu-btn ant-dropdown-link'}>
+            <Dropdown trigger={['click']} key={''} overlay={toJS(props.store.profile) ? menu : menuNoUser}
+                      className={'menu-btn ant-dropdown-link'}>
                 <UserOutlined/>
             </Dropdown>
 
@@ -101,11 +116,11 @@ export const RecordingPage = (props: { store: typeof AppStore }) => {
             <a className={'gallery-btn'} href="/gallery">Gallery</a>
             {/*<button className={'switch-btn'} onClick={switchCamera}>Switch Camera</button>*/}
             {!!dialogData &&
-                <MsgDialog data={dialogData}
-                           showModal={!!dialogData}
-                           handleOk={activate}
-                           handleCancel={closeDialog}
-                />
+            <MsgDialog data={dialogData}
+                       showModal={!!dialogData}
+                       handleOk={activate}
+                       handleCancel={closeDialog}
+            />
             }
         </div>
     );

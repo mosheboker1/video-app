@@ -32,7 +32,7 @@ export class GalleryPage extends React.Component<{}, GalleryState> {
 
     render() {
         return <div className={'full col'}>
-            <h1 className={'ctr'}>Recent Videos</h1>
+            <h2 className={'ctr m-2'}>Recent Videos</h2>
             <a className={'home-btn'} href="/"><FaChevronLeft/></a>
             <div className={'wrap even'}>
                 {this.state.videos?.length ? this.state.videos.map((vid, index) => {

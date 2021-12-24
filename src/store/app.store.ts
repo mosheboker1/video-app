@@ -1,7 +1,7 @@
 import {Profile} from '../models/profile';
 import {makeObservable, observable} from 'mobx';
 
-class AppStore {
+export class AppStore {
     profile: Profile = null;
     videos = [];
 

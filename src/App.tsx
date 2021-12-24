@@ -21,27 +21,27 @@ const App = observer(
                 profile: null
             };
 
-            this.authListener = this.authListener.bind(this);
-        }
+        this.authListener = this.authListener.bind(this);
+    }
 
-        componentDidMount() {
-            this.authListener();
-        }
+    componentDidMount() {
+        this.authListener();
+    }
 
-        authListener() {
-            const auth = getAuth(fire);
-            onAuthStateChanged(auth, user => {
-                if (user) {
-                    profileService.fetchProfile(user.uid).then((profile) => {
-                        appStore.setProfile(profile.data.data);
-                        this.setState({redirect: true});
-                    });
-                    this.setState({profile: user});
-                } else {
-                    this.setState({profile: null});
-                }
-            });
-        }
+    authListener() {
+        const auth = getAuth(fire);
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                profileService.fetchProfile(user.uid).then((profile) => {
+                    appStore.setProfile(profile.data.data);
+                    this.setState({redirect: true});
+                });
+                this.setState({profile: user});
+            } else {
+                this.setState({profile: null});
+            }
+        });
+    }
 
         render() {
             return (

@@ -25,7 +25,7 @@ export const VideoCard = (props: VideoCardProps) => {
                            controls
                     />
                 </div>
-                <LeafletMap coords={props.video.location}/>
+                {props.video.location && <LeafletMap coords={props.video.location}/>}
             </div>
 
         </div>
