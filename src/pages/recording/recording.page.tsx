@@ -36,9 +36,9 @@ export const RecordingPage = (props: { store: typeof AppStore }) => {
         navigator.geolocation.getCurrentPosition((e) => setStartPos({lat: e.coords.latitude, lon: e.coords.longitude}));
     };
 
-    let recordCompleted = (blob) => {
+    let recordCompleted = async (blob) => {
         const video: Video = {
-            createTime: dayjs().format('DD/MM/YYYY HH:mm'),
+            createdAt: dayjs().format('DD/MM/YYYY HH:mm'),
             file: new File([blob], dayjs().format('DDMMYY_HHmmss'), {
                 lastModified: new Date().getTime(),
                 type: blob.type
@@ -46,11 +46,11 @@ export const RecordingPage = (props: { store: typeof AppStore }) => {
             blob: blob,
             location: startPos
         };
-        uploads.saveFile(video);
-        debugger;
-        const profile = toJS(props.store.profile)
+        console.log({startPos});
+        await uploads.saveFile(video);
+        const profile = props.store.profile;
         if (profile) {
-            videosService.saveVideo(video, profile.id);
+            await videosService.saveVideo(video, profile.id);
         }
     };
 

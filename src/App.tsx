@@ -10,16 +10,20 @@ import RegisterPage from './pages/register/register.page';
 import fire from './assets/config/fire';
 import {getAuth, onAuthStateChanged} from 'firebase/auth';
 import {observer} from 'mobx-react';
-import appStore from './store/app.store';
+import {AppStore} from './store/app.store';
 import profileService from './services/profile.service';
 import {VideoPage} from './pages/video/video.page';
 
 const App = observer(
-    class App extends Component <{ profile?: null }> {
+    class App extends Component <{}, { user?: any, redirect: boolean }> {
+        appState: AppStore;
+
         constructor(props) {
             super(props);
+            this.appState = new AppStore();
             this.state = {
-                profile: null
+                user: null,
+                redirect: false
             };
 
             this.authListener = this.authListener.bind(this);
@@ -34,12 +38,12 @@ const App = observer(
             onAuthStateChanged(auth, user => {
                 if (user) {
                     profileService.fetchProfile(user.uid).then((profile) => {
-                        appStore.setProfile(profile.data.data);
+                        this.appState.setProfile(profile.data.data);
                         this.setState({redirect: true});
                     });
-                    this.setState({profile: user});
+                    this.setState({user});
                 } else {
-                    this.setState({profile: null});
+                    this.setState({user: null});
                 }
             });
         }
@@ -48,9 +52,10 @@ const App = observer(
             return (
                 <Router>
                     <Routes>
-                        <Route path="/" element={<RecordingPage store={appStore}/>}/>
-                        <Route path="/gallery" element={<GalleryPage/>}/>
-                        <Route path="/video/:id" element={<VideoPage/>}/>
+                        <Route path="/" element={<RecordingPage store={this.appState}/>}/>
+                        <Route path="/gallery"
+                               element={<GalleryPage fbId={this.state?.user?.uid} profile={this.appState?.profile}/>}/>
+                        <Route path="/gallery/:id" element={<VideoPage/>}/>
                         <Route path="/login" element={<LoginPage/>}/>
                         <Route path="/register" element={<RegisterPage/>}/>
                         <Route path="/reset" element={<RegisterPage/>}/>

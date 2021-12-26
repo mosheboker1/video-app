@@ -1,6 +1,10 @@
 export interface Video {
+    id?: string;
     blob: any;
-    file: File
+    file: File;
     location: any;
-    createTime: string;
+    createdAt: string;
+    name?: string;
+    linkUrl?:string;
+    profileId?:string;
 }
