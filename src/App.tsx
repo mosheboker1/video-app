@@ -12,6 +12,7 @@ import {getAuth, onAuthStateChanged} from 'firebase/auth';
 import {observer} from 'mobx-react';
 import appStore from './store/app.store';
 import profileService from './services/profile.service';
+import {VideoPage} from './pages/video/video.page';
 
 const App = observer(
     class App extends Component <{ profile?: null }> {
@@ -21,27 +22,27 @@ const App = observer(
                 profile: null
             };
 
-        this.authListener = this.authListener.bind(this);
-    }
+            this.authListener = this.authListener.bind(this);
+        }
 
-    componentDidMount() {
-        this.authListener();
-    }
+        componentDidMount() {
+            this.authListener();
+        }
 
-    authListener() {
-        const auth = getAuth(fire);
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                profileService.fetchProfile(user.uid).then((profile) => {
-                    appStore.setProfile(profile.data.data);
-                    this.setState({redirect: true});
-                });
-                this.setState({profile: user});
-            } else {
-                this.setState({profile: null});
-            }
-        });
-    }
+        authListener() {
+            const auth = getAuth(fire);
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    profileService.fetchProfile(user.uid).then((profile) => {
+                        appStore.setProfile(profile.data.data);
+                        this.setState({redirect: true});
+                    });
+                    this.setState({profile: user});
+                } else {
+                    this.setState({profile: null});
+                }
+            });
+        }
 
         render() {
             return (
@@ -49,6 +50,7 @@ const App = observer(
                     <Routes>
                         <Route path="/" element={<RecordingPage store={appStore}/>}/>
                         <Route path="/gallery" element={<GalleryPage/>}/>
+                        <Route path="/video/:id" element={<VideoPage/>}/>
                         <Route path="/login" element={<LoginPage/>}/>
                         <Route path="/register" element={<RegisterPage/>}/>
                         <Route path="/reset" element={<RegisterPage/>}/>
